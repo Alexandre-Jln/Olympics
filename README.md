@@ -1,0 +1,255 @@
+# Olympics
+
+Ce projet est un exemple d’application Python permettant de voir diverses
+informations sur les Jeux Olympiques de Paris 2024.
+
+Certaines données de la base de données viennent du dépôt
+https://github.com/22Ranjan15/Paris-2024-Olympic_Dashboard
+
+Il comprend 4 manières d’accéder aux données :
+
+- une interface web dans `olympics/api.py`.
+- une interface en ligne de commande dans `olympics/__main__.py`,
+- une bibliothèque pour afficher des résultats dans le terminal dans `olympics/cli.py`,
+- une bibliothèque bas-niveau pour accéder à la base de données dans `olympics/db.py`,
+
+Cette application est écrite à des fins éducatives, et ne suit pas toutes les
+bonnes pratiques du développement d’applications en Python.
+
+**Au-delà de Python, le but de cette évaluation est de vous familiariser avec
+les multiples facettes du développement : lecture et compréhension de code,
+découverte d’outils, lecture de documentation, qualité logicielle,
+architecture, intégration continue…**
+
+Le sujet d’évaluation, comprenant des opérations à réaliser et des questions,
+est inclus en bas de ce document.
+
+Si vous avez des réponses à donner ou des remarques à faire, une section est
+dédiée à cela en bas de ce document : écrivez ce que vous souhaitez, commitez
+et pushez ce document README.md. **N’écrivez pas de texte ailleurs que dans
+cette section !**
+
+Les devoirs dont le contenu est trop proche, dont l’historique Git est douteux,
+ou dont le code est si stupide qu’il ne peut pas avoir été écrit par vous,
+seront sanctionnés d’un D ou d’un E.
+
+
+## Comment l’installer
+
+1. [Importez](https://github.com/new/import) le dépôt en privé.
+
+2. Partagez votre dépôt en lecture avec moi.
+
+   Sur la page de votre fork GitHub, dans l’onglet « Settings », la section
+   « Collaborators and teams », vous avez un bouton « Add people ». Ajoutez
+   l’utilisateur « liZe » (Guillaume Ayoub).
+
+3. Clonez votre fork.
+
+   `git clone git@github.com:YourNickName/olympics.git`
+
+4. Allez dans votre dépôt cloné.
+
+   `cd olympics`
+
+5. Créez un environnement virtuel appelé `venv`.
+
+   `python -m venv venv`
+
+6. Activez votre environnement virtuel.
+
+7. Installez les dépendances du projet.
+
+   `pip install -e .`
+
+
+## Comment l’utiliser
+
+Pour utiliser l’application ou lancer les tests, veillez bien à être à la
+racine du dépôt que vous avez cloné et à activer l’environnement virtuel.
+
+### Pour utiliser l’API web
+
+`fastapi dev olympics`
+
+Vous avez alors accès à l’adresse `http://127.0.0.1:8000` et aux différentes
+routes de l’application.
+
+Une documentation automatique, avec une interface de test, est disponible à
+l’adresse `http://127.0.0.1:8000/docs`.
+
+Vous pouvez arrêter le serveur avec `Ctrl+C`.
+
+### Pour utiliser la CLI
+
+`python -m olympics --help`
+
+Différentes commandes s’offrent à vous. Pour afficher le top 5 des médailles
+individuelles, vous pouvez par exemple lancer :
+
+`python -m olympics individual --top=5`
+
+### Pour utiliser la bibliothèque
+
+`python`
+
+Dans l’interpréteur Python :
+
+```python
+>>> from olympics import cli
+>>> help(cli)
+```
+
+Différentes fonctions sont disponibles. Pour afficher le top 3 des pays pour
+les médailles collectives, vous pouvez par exemple lancer :
+
+```python
+>>> cli.top_collective(top=3)
+```
+
+Pour quitter l’interpréteur, utilisez `exit()`.
+
+### Pour utiliser les fonctions bas-niveau de la base de données
+
+`python`
+
+Dans l’interpréteur Python :
+
+```python
+>>> from olympics import db
+>>> help(db)
+```
+
+Différentes fonctions sont possibles. Pour récupérer une liste de tous les
+athlètes et afficher les informations du premier, vous pouvez par exemple
+lancer :
+
+```python
+>>> athletes = db.get_athletes()
+>>> dict(athletes[0])
+{'id': 1, 'name': 'Artur ALEKSANYAN', 'gender': 'male', 'country_id': 8}
+```
+
+Vous pouvez également lancer des requêtes SQL de cette manière :
+
+```python
+>>> cursor = db.get_connection().cursor()
+>>> athletes = cursor.execute('SELECT id, name FROM athlete LIMIT 5').fetchall()
+>>> dict(athletes[0])
+{'id': 1, 'name': 'Artur ALEKSANYAN'}
+```
+
+Le schéma de la base de données est dans `database/model.sql`.
+
+Pour quitter l’interpréteur, utilisez `exit()`.
+
+### Pour lancer les tests
+
+Quelques tests basiques sont disponibles dans le dossier `tests`.
+
+Pour lancer les tests, lancez `python -m pytest`
+
+
+## Sujet
+
+Le but de cette évaluation est d’améliorer cette application.
+
+**Vérifiez d’avoir bien tout commité et pushé à la fin de votre travail, en
+vérifiant les fichiers sur GitHub.**
+
+**Faites des commits atomiques, avec des messages lisibles.**
+
+**Si vous n’arrivez pas à faire une question, ne perdez pas trop de temps,
+passez à la suivante.**
+
+Les deux premières étapes sont obligatoires. Vous validerez le module si vous
+réalisez ces deux étapes parfaitement.
+
+Les autres étapes sont optionnelles. Vous pouvez en faire une ou plusieurs,
+dans l’ordre que vous souhaitez. Si vous les réalisez avec succès, vous pourrez
+améliorer le résultat de votre évaluation, pour assurer la validation ou aller
+chercher le A (si vous écrivez du code vraiment très, très intelligent).
+
+Vous pouvez également proposer vos propres améliorations, en restant dans les
+thématiques abordées en cours. Il est sans doute plus sûr de valider vos idées
+avec moi avant de coder.
+
+Dans tous les cas, privilégiez l’intelligence à la quantité. Utilisez ce que
+vous avez vu en cours, et la documentation des outils vus en cours.
+
+**N’écrivez que du code que vous comprenez.** Commentez votre code, en
+particulier lorsqu’il est compliqué ou que vous avez des doutes. Je suis
+réellement sévère sur ce point.
+
+Ne me faites pas installer d’autres outils que les dépendances actuelles du
+projet ou les bibliothèques que je vous demande d’installer pour cette
+évaluation.
+
+### Ajoutez une fonctionnalité (obligatoire)
+
+Le but de cette nouvelle fonctionnalité est d’afficher le top des meilleurs
+pays pour une discipline donnée en entrée. Pour cela, vous vous inspirerez du
+code pour le top des pays, des athlètes par discipline et des listes de
+médailles.
+
+Écrivez d’abord la fonction nécessaire dans `db.py`. Répétez les opérations
+dans `api.py`, `cli.py`, `__main__.py`.
+
+Ajoutez cette fonctionnalité en suivant la méthode TDD (Test Driven
+Development). À chaque fois, écrivez un test qui ne passe pas, commitez-le,
+puis ajoutez le code nécessaire pour faire passer ce test dans un autre commit.
+
+### Ajoutez une interface web (obligatoire)
+
+En utilisant Flask, ajoutez une interface web visant à afficher les mêmes
+informations que l’interface en ligne de commande.
+
+Créez un dossier `web` dans lequel vous mettrez un fichier `__init__.py` qui
+contiendra l’ensemble de votre code. D’autres fichiers (en particulier un
+dossier `templates`) pourront compléter votre application web.
+
+**Ce n’est pas un cours de HTML, de CSS ou de JavaScript.** Ne perdez pas de
+temps à faire une interface visuellement jolie, mais construisez vos routes
+avec soin. Vous ferez le reste sur votre temps libre, après le rendu !
+
+### Améliorez les tests l’application (facultatif)
+
+Ajoutez des tests pour votre interface web. La documentation de Flask donne des
+indications sur la manière dont les tests peuvent être ajoutés, n’hésitez pas à
+vous en inspirer.
+
+Les fonctions des modules Python sont faites pour être utilisées avec les bons
+types de paramètres, et ne gèrent volontairement pas les appels avec des types
+différents : ce ne sont donc pas des bugs. Par contre, les API web et en ligne
+de commande doivent rejeter proprement les types inattendus : si l’application
+lève une exception, on peut considérer cela comme un bug.
+
+### Utilisez un ORM (facultatif)
+
+Utilisez [SQLAlchemy](https://www.sqlalchemy.org/) à la place du module
+`sqlite3`. Inspirez-vous des bonnes pratiques données dans les documentations
+de FastAPI et de SQLAlchemy à ce sujet.
+
+### Refactorisez le code de `db.py` (facultatif)
+
+Avec ou sans SQLAlchemy, il est possible d’éviter les nombreuses répétitions de
+code dans le fichiers `db.py`. Ne serait-ce pas l’occasion d’utiliser des
+décorateurs pour rendre cela moins verbeux et plus élégant ?
+
+### Générez une documentation simple (facultatif)
+
+En utilisant [Sphinx](https://www.sphinx-doc.org/), générez une documentation
+simple. Pas la peine d’écrire des pavés de texte, une petite introduction et
+une documentation automatique de l’API Python sont largement suffisantes.
+
+Profitez-en pour mettre votre site en ligne avec GitHub Pages !
+
+
+## Réponses et remarques
+
+Si vous avez des réponses à écrire, des remarques à faire sur votre travail,
+ajoutez-les à la fin de ce fichier.
+
+**N’hésitez pas à expliquer vos réussites, vos doutes, vos erreurs, afin que je
+puisse mieux comprendre votre projet et en tenir compte lors de mon
+évaluation.**
