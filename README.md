@@ -494,3 +494,90 @@ La suite de tests couvre désormais :
 
 Grâce à ces ajouts, l’application atteint une **couverture fonctionnelle solide**,  
 et se comporte correctement même en présence d’**entrées non valides**.
+
+---
+
+# Utilisation de SQLAlchemy (facultatif)
+
+Une version expérimentale de la fonctionnalité **Top des pays par discipline** a été implémentée en utilisant **SQLAlchemy**, conformément à l’option facultative du sujet.  
+L’objectif est de montrer comment **remplacer progressivement les requêtes SQL brutes par un ORM moderne** et plus structuré.
+
+## Objectif
+
+  * Introduire SQLAlchemy dans le projet **sans casser l’architecture existante**.
+  * Proposer une **version ORM** de la fonctionnalité déjà développée.
+  * Illustrer les bonnes pratiques vues en cours : `models`, `session`, `engine`, requêtes ORM, intégration API.
+
+Cette partie est **indépendante** du code initial et **ne modifie pas** les fonctions existantes.
+
+## Architecture ORM ajoutée
+
+Un nouveau fichier a été ajouté :
+
+<code>
+olympics/database.py
+</code>
+
+Il contient :
+
+  * la configuration SQLAlchemy (`engine`, `SessionLocal`) ;
+  * la base déclarative (`Base`) ;
+  * les modèles ORM correspondant aux tables SQLite :
+    - `Country`
+    - `Athlete`
+    - `Team`
+    - `Discipline`
+    - `Event`
+    - `Medal`
+
+Ces modèles **reflètent fidèlement le schéma** existant dans `database/olympics.db`.
+
+Un second fichier regroupe la logique métier ORM :
+
+<code>
+olympics/db_orm.py
+</code>
+
+Il implémente une version ORM de la fonctionnalité principale :
+
+<code python>
+get_top_countries_by_discipline_orm(discipline_id, top)
+</code>
+
+Cette fonction utilise :
+
+  * `func.count` pour compter les médailles ;
+  * `func.coalesce` pour récupérer `country_id` depuis `Athlete` ou `Team` ;
+  * des jointures ORM (`join`, `outerjoin`) ;
+  * un `group_by` et un `order_by`.
+
+## Intégration avec FastAPI
+
+Une route API dédiée a été ajoutée :
+
+<code>
+GET /orm/top-by-discipline/?discipline_id=<id>&top=<n>
+</code>
+
+Elle utilise la **version ORM** et renvoie un JSON formaté comme suit :
+
+<code json>
+[
+  {"country": "France", "medals": 10},
+  {"country": "Japan", "medals": 8}
+]
+</code>
+
+Un traitement supplémentaire convertit les objets SQLAlchemy en **dictionnaires Python**,  
+afin d’éviter les erreurs d’encodage JSON.
+
+## Résultat
+
+La version ORM offre :
+
+  * une alternative **moderne et maintenable** aux requêtes SQL brutes ;
+  * une meilleure **abstraction de la base de données** ;
+  * un code plus **lisible** pour les futures évolutions ;
+  * une **intégration simple** avec FastAPI.
+
+> Cette partie reste **optionnelle** et **coexiste** avec le code existant, **sans le remplacer**.

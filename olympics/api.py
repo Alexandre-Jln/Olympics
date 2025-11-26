@@ -4,6 +4,9 @@ from fastapi import FastAPI
 
 from . import db
 
+from olympics.db_orm import get_top_countries_by_discipline_orm
+
+
 app = FastAPI()
 
 
@@ -141,3 +144,18 @@ def api_top_countries_by_discipline(discipline_id: int, top: int | None = 3):
         /top-by-discipline/?discipline_id=3&top=5
     """
     return get_top_countries_by_discipline(discipline_id, top)
+
+@app.get("/orm/top-by-discipline/")
+def orm_top_by_discipline(discipline_id: int, top: int = 5):
+    results = get_top_countries_by_discipline_orm(discipline_id, top)
+
+    # Conversion en objets JSON compatibles
+    output = []
+    for row in results:
+        # row[0] = country, row[1] = medals
+        output.append({
+            "country": row[0],
+            "medals": row[1]
+        })
+
+    return output
