@@ -10,3 +10,8 @@ def test_countries():
     response = client.get('/countries/')
     assert response.status_code == 200
     assert len(response.json()) > 100
+
+def test_api_top_by_discipline():
+    response = client.get('/top-by-discipline/?discipline_id=3&top=5')
+    assert response.status_code == 200
+    assert len(response.json()) <= 5

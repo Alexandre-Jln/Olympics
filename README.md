@@ -247,9 +247,102 @@ Profitez-en pour mettre votre site en ligne avec GitHub Pages !
 
 ## Réponses et remarques
 
-Si vous avez des réponses à écrire, des remarques à faire sur votre travail,
-ajoutez-les à la fin de ce fichier.
+### Nouvelle fonctionnalité : Top des pays par discipline
 
-**N’hésitez pas à expliquer vos réussites, vos doutes, vos erreurs, afin que je
-puisse mieux comprendre votre projet et en tenir compte lors de mon
-évaluation.**
+Cette mise à jour ajoute une fonctionnalité qui affiche le **classement des pays pour une discipline donnée**, en prenant en compte toutes les médailles des épreuves associées (individuelles et collectives).
+
+### Objectif
+
+  * Fournir une vue dédiée aux performances par discipline.
+  * Étendre l’architecture existante sans la casser, en réutilisant les mêmes patterns (`db → api → cli → __main__`).
+  * Garder le code simple et lisible, en restant proche de ce qui est déjà fait dans le projet.
+
+### Implémentation
+
+La fonctionnalité a été intégrée dans les différents modules du projet.
+
+### db.py
+
+**Ajout de la fonction :** `get_top_countries_by_discipline(discipline_id, top)`
+
+Cette fonction :
+
+  * joint les tables `medal`, `event`, `discipline`, `athlete`, `team`, `country` ;
+  * utilise `event.discipline_id` pour filtrer sur la discipline demandée ;
+  * récupère le pays depuis l’athlète ou l’équipe via : `COALESCE(athlete.country_id, team.country_id)` ;
+  * compte le nombre total de médailles par pays ;
+  * trie les pays par nombre de médailles décroissant ;
+  * limite le résultat au nombre demandé (top).
+
+**Pourquoi comme ça ?**
+
+Parce que le schéma de la base **ne stocke pas** `country_id` directement dans `medal`. Il faut donc reconstruire l’information via `athlete` ou `team`, d’où l’utilisation de `COALESCE`.
+
+Le style de la requête est aligné avec les fonctions existantes (`get_top_countries`, `get_top_collective`, `get_top_individual`).
+
+### api.py
+
+**Ajout d’un endpoint FastAPI :**  
+`GET /top-by-discipline/?discipline_id=<id>&top=<n>`
+
+Ce endpoint :
+
+  * appelle `get_top_countries_by_discipline` ;
+  * renvoie les données au format JSON ;
+  * suit le même modèle que les autres routes déjà présentes (routes de type `/top-*`).
+
+**Pourquoi comme ça ?**
+
+Pour rester **cohérent avec l’API existante** : chaque fonctionnalité SQL a un équivalent dans `api.py`, ce qui garde une structure claire et prévisible.
+
+### cli.py
+
+**Ajout d’une commande interne :**  
+`top_countries_by_discipline(discipline_id, top, file=None)`
+
+Cette commande :
+
+  * utilise `db.get_top_countries_by_discipline` ;
+  * affiche le résultat dans un tableau formaté avec **Rich** ;
+  * est construite sur le même modèle que `top_countries`, `top_collective` et `top_individual`.
+
+**Pourquoi comme ça ?**
+
+Pour offrir la même expérience en ligne de commande que les autres classements :  
+un **tableau lisible**, même style, mêmes conventions.
+
+### __main__.py
+
+**Ajout d’une nouvelle commande publique :**  
+`python -m olympics discipline --discipline-id <id> --top <n>`
+
+Modifications :
+
+  * ajout de `discipline` dans la liste des commandes possibles ;
+  * ajout de l’option `--discipline-id` ;
+  * ajout d’un cas dans le `match` pour appeler `cli.top_countries_by_discipline`.
+
+**Pourquoi comme ça ?**
+
+Pour que la nouvelle fonctionnalité soit accessible de la **même manière** que les autres (`countries`, `collective`, `individual`), sans changer la logique de base du lanceur.
+
+### Tests
+
+Des tests ont été ajoutés pour chaque couche, en suivant le style des fichiers de tests existants :
+
+  * `test_db.py` : vérifie que `get_top_countries_by_discipline` renvoie au plus `top` pays.
+  * `test_api.py` : teste le nouvel endpoint `/top-by-discipline/` (code 200, taille du résultat).
+  * `test_cli.py` : capture la sortie de `top_countries_by_discipline` et vérifie que le tableau est bien généré.
+  * `test_main.py` : vérifie que la commande `discipline` s’exécute sans erreur via `main(argv)`.
+
+**Pourquoi comme ça ?**
+
+Les tests restent **simples et concis**, mais ils couvrent chaque niveau (DB, API, CLI, point d’entrée) comme dans le projet d’origine, tout en respectant la contrainte de ne pas alourdir inutilement la base de tests.
+
+### Résumé des choix
+
+  * **Respect de l’architecture existante** : une nouvelle fonctionnalité, mais intégrée dans tous les niveaux déjà prévus (`db`, `api`, `cli`, `__main__`).
+  * **Adaptation au schéma SQL réel** : reconstruction correcte du pays via `athlete` ou `team`.
+  * **Lisibilité** : code proche des fonctions déjà présentes, pour rester facile à lire et à maintenir.
+  * **Testabilité** : chaque couche est testée, comme le reste du projet.
+

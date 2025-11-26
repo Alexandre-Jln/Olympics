@@ -311,3 +311,38 @@ def get_top_individual(top=10):
     ''', (top,)).fetchall()
     cursor.close()
     return rows
+
+def get_top_countries_by_discipline(discipline_id: int, top: int = 3):
+    """
+    Returns the top N countries for a given discipline.
+
+    Countries are ranked by number of medals (all types combined)
+    for events belonging to the given discipline.
+    """
+
+    cursor = get_connection().cursor()
+
+
+    rows = cursor.execute('''
+        SELECT
+            country.name AS country,
+            COUNT(medal.id) AS medals
+        FROM medal
+        JOIN event
+            ON medal.event_id = event.id
+        JOIN discipline
+            ON event.discipline_id = discipline.id
+        LEFT JOIN athlete
+            ON medal.athlete_id = athlete.id
+        LEFT JOIN team
+            ON medal.team_id = team.id
+        LEFT JOIN country
+            ON country.id = COALESCE(athlete.country_id, team.country_id)
+        WHERE discipline.id = ?
+        GROUP BY country.name
+        ORDER BY medals DESC
+        LIMIT ?
+    ''', (discipline_id, top)).fetchall()
+
+    cursor.close()
+    return rows

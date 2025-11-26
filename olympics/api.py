@@ -130,3 +130,14 @@ def top_individual(top: int | None = 10):
 
     """
     return db.get_top_individual(top)
+
+from .db import get_top_countries_by_discipline
+
+@app.get("/top-by-discipline/")
+def api_top_countries_by_discipline(discipline_id: int, top: int | None = 3):
+    """
+    Top des pays pour une discipline donnée (discipline_id).
+    Exemple :
+        /top-by-discipline/?discipline_id=3&top=5
+    """
+    return get_top_countries_by_discipline(discipline_id, top)

@@ -62,3 +62,21 @@ def top_individual(top=10, file=None):
 
     console = Console(file=file)
     console.print(table)
+
+def top_countries_by_discipline(discipline_id: int, top: int = 3, file=None):
+    """Display top countries for a given discipline."""
+
+    table = Table(title=f"Top {top} countries for discipline {discipline_id}")
+
+    table.add_column("Country")
+    table.add_column("Medals", justify="right")
+
+    for row in db.get_top_countries_by_discipline(discipline_id, top):
+        table.add_row(
+            row["country"],
+            str(row["medals"]),
+        )
+
+    console = Console(file=file)
+    console.print(table)
+
