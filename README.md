@@ -412,3 +412,85 @@ Cette route :
   * Code volontairement **minimal**, comme demandé dans l’énoncé.
   * Utilisation de Flask **sans ajout de CSS/JS**, conformément aux consignes.
   * **Séparation propre** entre logique Python et templates HTML.
+
+# 🧪 Amélioration des tests (facultatif)
+
+En complément des tests fournis avec le projet, une série de **nouveaux tests** a été ajoutée afin de renforcer la **qualité logicielle** et de couvrir **toutes les couches de l’application**, conformément aux recommandations du sujet.
+
+Ces tests vérifient également que l’application réagit correctement aux **entrées invalides**, notamment pour :
+
+  * l’API web (FastAPI),
+  * l’interface Flask,
+  * la ligne de commande (CLI).
+
+----
+
+# Amélioration des tests (facultatif)
+
+En complément des tests fournis avec le projet, une série de **nouveaux tests** a été ajoutée afin de renforcer la **qualité logicielle** et de couvrir **toutes les couches de l’application**, conformément aux recommandations du sujet.
+
+Ces tests permettent également de vérifier que l’application réagit correctement aux **entrées invalides**, notamment pour :
+
+  * l’API web (FastAPI),
+  * l’interface Flask,
+  * la ligne de commande (CLI).
+
+## Tests de l’interface web (Flask)
+
+Un fichier `tests/test_web.py` a été ajouté.  
+Il teste les éléments suivants :
+
+  * la page d’accueil (`/`) ;
+  * la route affichant le top des pays pour une discipline (`/discipline/<id>?top=N`) ;
+  * la gestion des entrées invalides (ex. `/discipline/abc` → 404).
+
+L’application Flask est testée via son mode test intégré :
+
+<code python>
+from olympics.web import app
+
+client = app.test_client()
+response = client.get("/")
+assert response.status_code == 200
+</code>
+
+Ces tests garantissent que l’**interface web fonctionne correctement** et **ne lève pas d’exceptions**.
+
+## Tests de validation des paramètres (API FastAPI)
+
+Les API doivent **rejeter proprement les types inattendus**.
+
+Un test a été ajouté pour s'assurer que **FastAPI renvoie bien une erreur 422** (`Unprocessable Entity`) lorsqu’un paramètre incorrect est transmis :
+
+<code python>
+response = client.get("/top-by-discipline/?discipline_id=abc&top=5")
+assert response.status_code == 422
+</code>
+
+Ce comportement valide la **robustesse du typage automatique** assuré par FastAPI.
+
+## Tests de validation des paramètres (CLI)
+
+La ligne de commande doit également gérer proprement les **erreurs de typage utilisateur**.
+
+Un test a été ajouté pour vérifier qu’un argument invalide pour `--discipline-id` déclenche bien une **erreur `SystemExit`** (levée par `argparse`) :
+
+<code python>
+with pytest.raises(SystemExit):
+    main(["discipline", "--discipline-id", "abc"])
+</code>
+
+Cela évite un **crash Python non contrôlé** et confirme que l’application gère correctement les entrées non valides.
+ 
+## Résultat global
+
+La suite de tests couvre désormais :
+
+  * l’accès bas-niveau à la **base de données** ;
+  * les **API FastAPI** ;
+  * la **ligne de commande** (CLI) ;
+  * l’**interface web Flask** ;
+  * la **gestion des erreurs et des types inattendus**.
+
+Grâce à ces ajouts, l’application atteint une **couverture fonctionnelle solide**,  
+et se comporte correctement même en présence d’**entrées non valides**.
