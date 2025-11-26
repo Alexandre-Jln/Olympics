@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Top pays - Discipline {{ discipline_id }}</title>
+</head>
+<body>
+    <h1>Top {{ top }} pays pour la discipline {{ discipline_id }}</h1>
+
+    <table border="1" cellpadding="4">
+        <tr>
+            <th>Pays</th>
+            <th>Médailles</th>
+        </tr>
+
+        {% for row in rows %}
+        <tr>
+            <td>{{ row["country"] }}</td>
+            <td>{{ row["medals"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>

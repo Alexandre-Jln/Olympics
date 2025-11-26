@@ -245,9 +245,9 @@ une documentation automatique de l’API Python sont largement suffisantes.
 Profitez-en pour mettre votre site en ligne avec GitHub Pages !
 
 
-## Réponses et remarques
+# Réponses et remarques
 
-### Nouvelle fonctionnalité : Top des pays par discipline
+## Nouvelle fonctionnalité : Top des pays par discipline
 
 Cette mise à jour ajoute une fonctionnalité qui affiche le **classement des pays pour une discipline donnée**, en prenant en compte toutes les médailles des épreuves associées (individuelles et collectives).
 
@@ -346,3 +346,69 @@ Les tests restent **simples et concis**, mais ils couvrent chaque niveau (DB, AP
   * **Lisibilité** : code proche des fonctions déjà présentes, pour rester facile à lire et à maintenir.
   * **Testabilité** : chaque couche est testée, comme le reste du projet.
 
+## Interface web (Flask)
+
+Une interface web simple, développée avec **Flask**, a été ajoutée afin d’afficher les mêmes informations que l’interface en ligne de commande.
+
+Conformément aux instructions du sujet, l’objectif est uniquement **fonctionnel** : l’interface **n’a pas vocation à être visuellement travaillée**.
+
+### Structure
+
+L’interface web se trouve dans le dossier :
+
+  olympics/web/
+
+Elle contient :
+
+  * `__init__.py` : code principal de l’application Flask
+  * `__main__.py` : permet l’exécution via `python -m olympics.web`
+  * `templates/top_discipline.html` : template HTML minimal affichant un tableau
+
+### Lancer l’interface web
+
+Pour démarrer l’application :
+
+<code>
+python -m olympics.web
+</code>
+
+L’application sera disponible à l’adresse suivante :
+
+<code>
+http://127.0.0.1:5000
+</code>
+
+## Routes disponibles
+
+### Page d’accueil
+
+<code>
+GET /
+</code>
+
+Affiche une page simple expliquant comment utiliser l’interface.
+
+### Top des pays pour une discipline
+
+<code>
+GET /discipline/&lt;discipline_id&gt;?top=N
+</code>
+
+Exemple :
+
+<code>
+http://127.0.0.1:5000/discipline/3?top=5
+</code>
+
+Cette route :
+
+  * utilise `db.get_top_countries_by_discipline` ;
+  * affiche les résultats dans un **tableau HTML** ;
+  * accepte un paramètre `top` optionnel (**5 par défaut**).
+
+### Pourquoi cette approche ?
+
+  * Respect total de la structure en couches déjà présente dans le projet (`db → cli → api → main → web`).
+  * Code volontairement **minimal**, comme demandé dans l’énoncé.
+  * Utilisation de Flask **sans ajout de CSS/JS**, conformément aux consignes.
+  * **Séparation propre** entre logique Python et templates HTML.
