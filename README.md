@@ -1,4 +1,4 @@
-# Olympics
+ # Olympics
 
 Ce projet est un exemple d’application Python permettant de voir diverses
 informations sur les Jeux Olympiques de Paris 2024.
@@ -413,16 +413,6 @@ Cette route :
   * Utilisation de Flask **sans ajout de CSS/JS**, conformément aux consignes.
   * **Séparation propre** entre logique Python et templates HTML.
 
-# 🧪 Amélioration des tests (facultatif)
-
-En complément des tests fournis avec le projet, une série de **nouveaux tests** a été ajoutée afin de renforcer la **qualité logicielle** et de couvrir **toutes les couches de l’application**, conformément aux recommandations du sujet.
-
-Ces tests vérifient également que l’application réagit correctement aux **entrées invalides**, notamment pour :
-
-  * l’API web (FastAPI),
-  * l’interface Flask,
-  * la ligne de commande (CLI).
-
 ----
 
 # Amélioration des tests (facultatif)
@@ -506,7 +496,6 @@ L’objectif est de montrer comment **remplacer progressivement les requêtes SQ
 
   * Introduire SQLAlchemy dans le projet **sans casser l’architecture existante**.
   * Proposer une **version ORM** de la fonctionnalité déjà développée.
-  * Illustrer les bonnes pratiques vues en cours : `models`, `session`, `engine`, requêtes ORM, intégration API.
 
 Cette partie est **indépendante** du code initial et **ne modifie pas** les fonctions existantes.
 
