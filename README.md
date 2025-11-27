@@ -276,7 +276,7 @@ Cette fonction :
 
 **Pourquoi comme ça ?**
 
-Parce que le schéma de la base **ne stocke pas** `country_id` directement dans `medal`. Il faut donc reconstruire l’information via `athlete` ou `team`, d’où l’utilisation de `COALESCE`.
+Parce que le schéma de la base **ne stocke pas** `country_id` directement dans `medal`. J'ai donc reconstruire l’information via `athlete` ou `team`, d’où l’utilisation de `COALESCE`.
 
 Le style de la requête est aligné avec les fonctions existantes (`get_top_countries`, `get_top_collective`, `get_top_individual`).
 
@@ -303,13 +303,13 @@ Pour rester **cohérent avec l’API existante** : chaque fonctionnalité SQL a 
 Cette commande :
 
   * utilise `db.get_top_countries_by_discipline` ;
-  * affiche le résultat dans un tableau formaté avec **Rich** ;
+  * affiche le résultat dans un tableau formaté;
   * est construite sur le même modèle que `top_countries`, `top_collective` et `top_individual`.
 
 **Pourquoi comme ça ?**
 
 Pour offrir la même expérience en ligne de commande que les autres classements :  
-un **tableau lisible**, même style, mêmes conventions.
+un **tableau lisible**, même style et mêmes conventions.
 
 ### __main__.py
 
@@ -328,7 +328,7 @@ Pour que la nouvelle fonctionnalité soit accessible de la **même manière** qu
 
 ### Tests
 
-Des tests ont été ajoutés pour chaque couche, en suivant le style des fichiers de tests existants :
+J'ai ajoutés des tests pour chaque couche, en suivant le style des fichiers de tests existants :
 
   * `test_db.py` : vérifie que `get_top_countries_by_discipline` renvoie au plus `top` pays.
   * `test_api.py` : teste le nouvel endpoint `/top-by-discipline/` (code 200, taille du résultat).
@@ -345,6 +345,12 @@ Les tests restent **simples et concis**, mais ils couvrent chaque niveau (DB, AP
   * **Adaptation au schéma SQL réel** : reconstruction correcte du pays via `athlete` ou `team`.
   * **Lisibilité** : code proche des fonctions déjà présentes, pour rester facile à lire et à maintenir.
   * **Testabilité** : chaque couche est testée, comme le reste du projet.
+
+### Imprévu
+
+Pas de problème particulier, ajout de la fonctionnalité et des tests qui se sont bien déroulés dans l'ensemble.
+
+---
 
 ## Interface web (Flask)
 
@@ -413,6 +419,10 @@ Cette route :
   * Utilisation de Flask **sans ajout de CSS/JS**, conformément aux consignes.
   * **Séparation propre** entre logique Python et templates HTML.
 
+### Imprévu
+
+Utilisation de Flask assez simple à prendre en main, construction d'une seule route faite sciemment pour éviter de trop mettre de code et de HTML.
+
 ----
 
 # Amélioration des tests (facultatif)
@@ -434,7 +444,7 @@ Il teste les éléments suivants :
   * la route affichant le top des pays pour une discipline (`/discipline/<id>?top=N`) ;
   * la gestion des entrées invalides (ex. `/discipline/abc` → 404).
 
-L’application Flask est testée via son mode test intégré :
+L’application Flask est testée via son mode test intégré que j'ai vu dans la doc :
 
 <code python>
 from olympics.web import app
@@ -485,11 +495,15 @@ La suite de tests couvre désormais :
 Grâce à ces ajouts, l’application atteint une **couverture fonctionnelle solide**,  
 et se comporte correctement même en présence d’**entrées non valides**.
 
+### Imprévu
+
+Pas d'imprévu à communiquer.
+
 ---
 
 # Utilisation de SQLAlchemy (facultatif)
 
-Une version expérimentale de la fonctionnalité **Top des pays par discipline** a été implémentée en utilisant **SQLAlchemy**, conformément à l’option facultative du sujet.  
+Une version expérimentale de la fonctionnalité **Top des pays par discipline** que j'ai implémentée en utilisant **SQLAlchemy**.  
 L’objectif est de montrer comment **remplacer progressivement les requêtes SQL brutes par un ORM moderne** et plus structuré.
 
 ## Objectif
@@ -501,7 +515,7 @@ Cette partie est **indépendante** du code initial et **ne modifie pas** les fon
 
 ## Architecture ORM ajoutée
 
-Un nouveau fichier a été ajouté :
+J'ai ajouté un nouveau fichier :
 
 <code>
 olympics/database.py
@@ -548,7 +562,7 @@ Une route API dédiée a été ajoutée :
 GET /orm/top-by-discipline/?discipline_id=<id>&top=<n>
 </code>
 
-Elle utilise la **version ORM** et renvoie un JSON formaté comme suit :
+Elle utilise la **version ORM** et renvoie un JSON formaté comme ceci :
 
 <code json>
 [
@@ -569,4 +583,6 @@ La version ORM offre :
   * un code plus **lisible** pour les futures évolutions ;
   * une **intégration simple** avec FastAPI.
 
-> Cette partie reste **optionnelle** et **coexiste** avec le code existant, **sans le remplacer**.
+### Imprévu
+
+J'ai eu un imprévu et (ou) j'ai dû faire un traitement supplémentaire. En fait, SQLAlchemy m'a renvoyé des objets qui ne pouvaient pas être encodés directement en JSON par FastAPI. Du coup, sans cette conversion que j'ai ajoutée, cela provoquait une erreur 500. Les résultats ORM ont donc été transformés en dictionnaires Python afin de garantir une réponse JSON valide et compatible avec l’API.
